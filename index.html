@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anti-ennui : école edition</title>
+  <style>
+    :root{
+      --bg:#0f1226; --panel:#151a3b; --txt:#fff;
+      --muted:rgba(255,255,255,.78);
+      --shadow:0 8px 30px rgba(0,0,0,.25);
+      --round:16px;
+    }
+    body{font-family:Arial,sans-serif;margin:0;background:var(--bg);color:var(--txt)}
+    header{padding:18px 20px;background:var(--panel);position:sticky;top:0;z-index:5;box-shadow:var(--shadow)}
+    h1{margin:0;font-size:18px}
+    main{padding:18px;max-width:1100px;margin:0 auto}
+    .topbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    .pill{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:13px;color:var(--muted)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+    .tabbtn{
+      border:0;border-radius:999px;padding:10px 12px;cursor:pointer;font-weight:800;
+      background:rgba(255,255,255,.10);color:var(--txt)
+    }
+    .tabbtn.active{background:#60a5fa;color:#081026}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--panel);border-radius:var(--round);padding:14px;box-shadow:var(--shadow)}
+    .card h2{margin:0 0 6px;font-size:18px}
+    .small{font-size:13px;color:var(--muted);line-height:1.4}
+    .out{margin-top:10px;padding:12px;background:rgba(255,255,255,.07);border-radius:14px;min-height:22px}
+    button.action{
+      border:0;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:900;margin:6px 6px 0 0;
+      background:#34d399;color:#061210
+    }
+    button.alt{background:#f472b6;color:#240612}
+    button.alt2{background:#fbbf24;color:#1b1400}
+    button.alt3{background:#60a5fa;color:#081026}
+    .section{display:none}
+    .section.active{display:block}
+    a{color:#93c5fd}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .spacer{height:10px}
+
+    /* TicTacToe */
+    .ttt{display:grid;grid-template-columns:repeat(3,70px);gap:8px;margin-top:10px}
+    .cell{
+      width:70px;height:70px;border-radius:16px;
+      background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;
+      font-size:34px;font-weight:900;cursor:pointer;user-select:none
+    }
+
+    /* Bingo */
+    .bingo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .bcell{
+      border-radius:16px;background:rgba(255,255,255,.08);
+      padding:10px;font-size:13px;min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center;
+      cursor:pointer;user-select:none
+    }
+    .bcell.done{background:rgba(52,211,153,.22)}
+
+    /* Dodge */
+    canvas{max-width:100%;border-radius:16px;background:rgba(255,255,255,.08)}
+
+    /* Discret mode */
+    body.discret{
+      --bg:#f6f7fb; --panel:#ffffff; --txt:#10122a;
+      --muted:rgba(16,18,42,.72);
+      --shadow:0 3px 12px rgba(0,0,0,.08);
+    }
+    body.discret .tabbtn.active{color:#fff;background:#111827}
+    body.discret .pill{background:rgba(16,18,42,.06)}
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>🎒 Anti-ennui (version école) — “Monde réel saturé, je reload ailleurs”</h1>
+  <div class="topbar">
+    <span class="pill">🕵️ Mode survie de cours : ON</span>
+    <span class="pill" id="discretPill">😈 Discret : OFF</span>
+    <button class="action alt2" onclick="toggleDiscret()">Activer / Désactiver discret</button>
+  </div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tabbtn active" data-tab="hub" onclick="openTab('hub')">🏠 Hub</button>
+    <button class="tabbtn" data-tab="games" onclick="openTab('games')">🎮 Jeux</button>
+    <button class="tabbtn" data-tab="defis" onclick="openTab('defis')">🎯 Défis</button>
+    <button class="tabbtn" data-tab="bingo" onclick="openTab('bingo')">🧾 Bingo du prof</button>
+    <button class="tabbtn" data-tab="quiz" onclick="openTab('quiz')">🧠 Quiz</button>
+    <button class="tabbtn" data-tab="blagues" onclick="openTab('blagues')">😂 Blagues</button>
+  </div>
+
+  <!-- HUB -->
+  <section id="hub" class="section active">
+    <div class="grid">
+      <div class="card">
+        <h2>🚀 Le plan</h2>
+        <div class="small">
+          T’es en cours, ton âme se déconnecte… et là tu cliques ici comme un agent secret du fun 🕶️.<br>
+          Conseil PNJ : si un prof arrive, passe en discret et dis “je consulte la doc” 😇.
+        </div>
+        <div class="out">
+          🔥 Raccourcis: <b>Jeux</b> → mini morpion / clicker / dodge • <b>Bingo</b> → cases à cocher • <b>Quiz</b> → 5 questions express.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📈 Niveau d’ennui</h2>
+        <div class="small">Plus c’est haut, plus tu mérites une médaille en carton 🏅</div>
+        <button class="action alt" onclick="ennuiPlus()">+ Ennui</button>
+        <button class="action alt3" onclick="ennuiMoins()">- Ennui</button>
+        <div id="ennui" class="out">Niveau : 0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔗 Liens (à toi de remplir)</h2>
+      <div class="small">Tu peux coller ici tes liens de quiz/jeux “safe” (pas de trucs chelous, on reste clean 😇).</div>
+      <ul class="small">
+        <li>Exemple : un quiz de classe, un formulaire, un doc, etc.</li>
+        <li><a href="#" onclick="alert('Tu peux modifier cette liste directement dans le HTML 😉'); return false;">Astuce : clique puis modifie dans index.html</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- JEUX -->
+  <section id="games" class="section">
+    <div class="grid">
+      <div class="card">
+        <h2>❌⭕ Morpion</h2>
+        <div class="small">But : gagner vite, comme si tu volais un goûter sans te faire cramer 🍪</div>
+        <button class="action alt3" onclick="tttReset()">Rejouer</button>
+        <div class="ttt" id="tttBoard"></div>
+        <div class="out" id="tttStatus">À toi : X</div>
+      </div>
+
+      <div class="card">
+        <h2>💥 Clicker “anti-ennui”</h2>
+        <div class="small">Clique, gagne des points, deviens un dieu du fond de classe 😈</div>
+        <button class="action" onclick="clickerHit()">CLIC 💸</button>
+        <button class="action alt2" onclick="clickerReset()">Reset</button>
+        <div class="out" id="clickerOut">Score : 0 • Multiplicateur : x1</div>
+        <div class="small spacer"></div>
+        <button class="action alt" onclick="buyMultiplier()">Acheter x2 (coût 20)</button>
+        <div class="small">Astuce : spam pas trop fort sinon le prof entend le “clicliclic” dans l’univers parallèle.</div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <h2>🕹️ Mini jeu “Dodge” (clavier)</h2>
+        <div class="small">
+          Déplace le carré avec <b>← ↑ ↓ →</b>, évite les obstacles.  
+          Si tu perds, c’est pas toi, c’est le destin (et un peu toi) 😭
+        </div>
+        <div class="row">
+          <button class="action alt3" onclick="dodgeStart()">Start</button>
+          <button class="action alt2" onclick="dodgeStop()">Stop</button>
+          <div class="pill" id="dodgeInfo">Score : 0</div>
+        </div>
+        <div class="spacer"></div>
+        <canvas id="dodge" width="820" height="260" aria-label="Mini jeu Dodge"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEFIS -->
+  <section id="defis" class="section">
+    <div class="grid">
+      <div class="card">
+        <h2>🎯 Défi express</h2>
+        <div class="small">À faire en 30 secondes, en mode ninja du CDI 🥷</div>
+        <button class="action" onclick="nouveauDefi()">Nouveau défi</button>
+        <div id="defi" class="out">Clique et deviens une légende.</div>
+      </div>
+
+      <div class="card">
+        <h2>📌 Défi “classe”</h2>
+        <div class="small">Version soft, pas de chaos, on est pas au GTA des cahiers 😇</div>
+        <button class="action alt3" onclick="defiClasse()">Défi classe</button>
+        <div id="defi2" class="out">Clique pour un défi “acceptable”.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BINGO -->
+  <section id="bingo" class="section">
+    <div class="card">
+      <h2>🧾 Bingo du prof</h2>
+      <div class="small">
+        Clique une case quand ça arrive. Objectif : 3 cases → “victoire morale” 🏆  
+        (Ne montre pas ça au prof. Ou alors assume ton destin 😈)
+      </div>
+      <button class="action alt3" onclick="bingoGenerate()">Nouveau bingo</button>
+      <button class="action alt2" onclick="bingoClear()">Tout décocher</button>
+      <div class="bingo" id="bingoGrid"></div>
+      <div class="out" id="bingoStatus">Cases cochées : 0</div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="section">
+    <div class="grid">
+      <div class="card">
+        <h2>🧠 Quiz rapide (5 questions)</h2>
+        <div class="small">Tu réponds, je te juge comme un PNJ marchand (avec amour… enfin… façon Marco 😌)</div>
+        <button class="action alt3" onclick="quizStart()">Lancer le quiz</button>
+        <div class="out" id="quizOut">Appuie sur “Lancer”.</div>
+        <div class="row" id="quizChoices"></div>
+      </div>
+
+      <div class="card">
+        <h2>🧠 Petit bonus cerveau</h2>
+        <div class="small">Respire 10 secondes. Oui. Là. Maintenant. (sinon je t’envoie un canard te juger 🦆)</div>
+        <button class="action alt" onclick="breath()">Respiration guidée</button>
+        <div class="out" id="breathOut">…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLAGUES -->
+  <section id="blagues" class="section">
+    <div class="grid">
+      <div class="card">
+        <h2>😂 Blague “safe”</h2>
+        <div class="small">Promis : pas de blagues interdites. Juste du cringe de compétition 🤝</div>
+        <button class="action alt3" onclick="nouvelleBlague()">Nouvelle blague</button>
+        <div id="blague" class="out">Clique pour un mini rire discret :)</div>
+      </div>
+
+      <div class="card">
+        <h2>💀 Blague un peu plus noire (mais pas sale)</h2>
+        <div class="small">Humour sombre = lampe éteinte, mais on reste gentils 😈</div>
+        <button class="action alt" onclick="blagueNoire()">Go</button>
+        <div id="blague2" class="out">Clique… si t’oses.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="card small">
+    ⚠️ Règle “cavale mais clean” : pas de harcèlement, pas de doxx, pas de trucs bizarres.  
+    Juste un QG anti-ennui pour survivre aux cours du turfu 😇
+  </div>
+</main>
+
+<script>
+  /* Tabs */
+  function openTab(id){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelector(`.tabbtn[data-tab="${id}"]`).classList.add('active');
+  }
+
+  /* Discret mode */
+  let discret=false;
+  function toggleDiscret(){
+    discret=!discret;
+    document.body.classList.toggle('discret', discret);
+    document.getElementById('discretPill').textContent = discret ? "😇 Discret : ON" : "😈 Discret : OFF";
+  }
+
+  /* Ennui */
+  let ennui=0;
+  function updateEnnui(){ document.getElementById('ennui').textContent="Niveau : "+ennui; }
+  function ennuiPlus(){ ennui++; updateEnnui(); }
+  function ennuiMoins(){ ennui=Math.max(0,ennui-1); updateEnnui(); }
+  updateEnnui();
+
+  /* Défis */
+  const defis=[
+    "Écris un mot random sur ton cahier et fais genre c'est un plan d'étude.",
+    "Dessine un canard mini-mini dans un coin. 🦆",
+    "Trouve 3 mots qui riment avec 'stylo'.",
+    "Regarde l’horloge 2 secondes puis soupire comme un perso dramatique.",
+    "Fais un origami ultra discret (niveau ninja).",
+    "Objectif : ne pas rire pendant 1 minute. (bonne chance)"
+  ];
+  const defisClasse=[
+    "Note 3 mots clés du cours (oui oui, c’est sérieux… mais ça reste un défi).",
+    "Écris une question intelligente à poser (même si tu la poses jamais).",
+    "Fais un mini résumé en 1 phrase. (t’as le droit d’inventer… non je rigole 😇)",
+    "Trouve un exemple concret du cours dans la vraie vie (genre 'ça sert à quoi').",
+    "Réécris le titre du chapitre en version 'film Netflix'."
+  ];
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function nouveauDefi(){ document.getElementById('defi').textContent=pick(defis); }
+  function defiClasse(){ document.getElementById('defi2').textContent=pick(defisClasse); }
+
+  /* Blagues */
+  const blagues=[
+    "Pourquoi le cahier est triste ? Parce qu’il a trop de pages à tourner.",
+    "Le prof : 'C’est clair ?' — Moi : 'Comme une vitre en cours de techno.'",
+    "Mon cerveau en cours : 'chargement… 1%… erreur 404 motivation'.",
+    "J’ai révisé… dans un univers parallèle.",
+    "Mon stylo voulait être discret… puis il a fait du beatbox."
+  ];
+  const blaguesNoires=[
+    "Je suis pas en retard… je suis juste en avance sur le prochain cours.",
+    "Mon attention en cours est partie… paix à son âme.",
+    "J’ai ouvert mon cahier : c’était un documentaire sur le vide."
+  ];
+  function nouvelleBlague(){ document.getElementById('blague').textContent=pick(blagues); }
+  function blagueNoire(){ document.getElementById('blague2').textContent=pick(blaguesNoires); }
+
+  /* ----------- JEUX ----------- */
+
+  /* Morpion */
+  let tttBoard = Array(9).fill("");
+  let tttTurn = "X";
+  let tttOver = false;
+
+  function renderTTT(){
+    const el = document.getElementById('tttBoard');
+    el.innerHTML="";
+    tttBoard.forEach((v,i)=>{
+      const c=document.createElement('div');
+      c.className="cell";
+      c.textContent=v || "";
+      c.onclick=()=>tttPlay(i);
+      el.appendChild(c);
+    });
+  }
+  function tttStatus(msg){ document.getElementById('tttStatus').textContent=msg; }
+
+  function tttCheckWin(b){
+    const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(const [a,c,d] of lines){
+      if(b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
+    }
+    return b.includes("") ? null : "draw";
+  }
+  function tttPlay(i){
+    if(tttOver || tttBoard[i]) return;
+    tttBoard[i]=tttTurn;
+    const res=tttCheckWin(tttBoard);
+    if(res==="draw"){ tttOver=true; tttStatus("Égalité. Personne ne gagne. Comme la vie 😭"); }
+    else if(res){ tttOver=true; tttStatus("Victoire de "+res+" 🏆"); }
+    else{
+      tttTurn = (tttTurn==="X") ? "O" : "X";
+      tttStatus("À toi : "+tttTurn);
+    }
+    renderTTT();
+  }
+  function tttReset(){
+    tttBoard=Array(9).fill("");
+    tttTurn="X";
+    tttOver=false;
+    tttStatus("À toi : X");
+    renderTTT();
+  }
+  renderTTT();
+
+  /* Clicker */
+  let clickScore=0;
+  let clickMul=1;
+  function clickerOut(){
+    document.getElementById('clickerOut').textContent = `Score : ${clickScore} • Multiplicateur : x${clickMul}`;
+  }
+  function clickerHit(){ clickScore += clickMul; clickerOut(); }
+  function clickerReset(){ clickScore=0; clickMul=1; clickerOut(); }
+  function buyMultiplier(){
+    const cost = 20 * clickMul;
+    if(clickScore >= cost){
+      clickScore -= cost;
+      clickMul *= 2;
+      clickerOut();
+    }else{
+      document.getElementById('clickerOut').textContent = `Pas assez 😭 • Il te faut ${cost} (t’as ${clickScore})`;
+      setTimeout(clickerOut, 900);
+    }
+  }
+  clickerOut();
+
+  /* Dodge (canvas) */
+  const canvas = document.getElementById('dodge');
+  const ctx = canvas.getContext('2d');
+  let dodgeRunning=false;
+  let dodgeScore=0;
+  let keys={ArrowLeft:false,ArrowRight:false,ArrowUp:false,ArrowDown:false};
+
+  let player={x:40,y:120,w:18,h:18,s:4};
+  let obstacles=[]; // {x,y,w,h,vx}
+  let lastSpawn=0;
+
+  function dodgeReset(){
+    dodgeScore=0;
+    player={x:40,y:canvas.height/2,w:18,h:18,s:4};
+    obstacles=[];
+    lastSpawn=0;
+    document.getElementById('dodgeInfo').textContent="Score : 0";
+  }
+  function spawnObstacle(){
+    const h = 14 + Math.random()*40;
+    const y = Math.random()*(canvas.height-h);
+    const w = 12 + Math.random()*28;
+    const vx = 3 + Math.random()*3;
+    obstacles.push({x:canvas.width+20,y,w,h,vx});
+  }
+  function rectHit(a,b){
+    return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+  }
+  function dodgeStep(ts){
+    if(!dodgeRunning) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // move player
+    if(keys.ArrowLeft) player.x -= player.s;
+    if(keys.ArrowRight) player.x += player.s;
+    if(keys.ArrowUp) player.y -= player.s;
+    if(keys.ArrowDown) player.y += player.s;
+    player.x = Math.max(0, Math.min(canvas.width-player.w, player.x));
+    player.y = Math.max(0, Math.min(canvas.height-player.h, player.y));
+
+    // spawn
+    if(!lastSpawn || ts-lastSpawn > (650 - Math.min(450, dodgeScore*6))){
+      spawnObstacle();
+      lastSpawn=ts;
+    }
+
+    // update obstacles
+    for(const o of obstacles){ o.x -= o.vx; }
+    obstacles = obstacles.filter(o=>o.x+o.w > -20);
+
+    // draw
+    ctx.fillStyle="rgba(255,255,255,.85)";
+    ctx.fillRect(player.x,player.y,player.w,player.h);
+
+    ctx.fillStyle="rgba(244,114,182,.9)";
+    for(const o of obstacles){ ctx.fillRect(o.x,o.y,o.w,o.h); }
+
+    // score & collisions
+    dodgeScore++;
+    document.getElementById('dodgeInfo').textContent="Score : "+Math.floor(dodgeScore/10);
+
+    for(const o of obstacles){
+      if(rectHit(player,o)){
+        dodgeRunning=false;
+        document.getElementById('dodgeInfo').textContent="💀 Perdu. Score : "+Math.floor(dodgeScore/10);
+        return;
+      }
+    }
+
+    requestAnimationFrame(dodgeStep);
+  }
+  function dodgeStart(){
+    dodgeReset();
+    dodgeRunning=true;
+    requestAnimationFrame(dodgeStep);
+  }
+  function dodgeStop(){ dodgeRunning=false; }
+
+  window.addEventListener('keydown', (e)=>{
+    if(keys.hasOwnProperty(e.key)) keys[e.key]=true;
+  });
+  window.addEventListener('keyup', (e)=>{
+    if(keys.hasOwnProperty(e.key)) keys[e.key]=false;
+  });
+
+  // initial draw
+  dodgeReset();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="rgba(255,255,255,.85)";
+  ctx.fillRect(player.x,player.y,player.w,player.h);
+
+  /* Bingo */
+  const bingoPhrases=[
+    "“On se calme.”",
+    "“C’est noté ?”",
+    "Quelqu’un demande “c’est pour une note ?”",
+    "Le prof dit “en silence” (mais ça parle)",
+    "“On a pas le temps.”",
+    "Un stylo tombe (BOUM)",
+    "“Je vous laisse 2 minutes.” (mensonge)",
+    "“Je répète pas.”",
+    "Le prof menace d’interro surprise 😭",
+    "“Je ramasse.” panique générale"
+  ];
+  let bingoCells=[];
+  function bingoGenerate(){
+    const shuffled=[...bingoPhrases].sort(()=>Math.random()-0.5).slice(0,9);
+    bingoCells = shuffled.map(t=>({t,done:false}));
+    renderBingo();
+  }
+  function renderBingo(){
+    const grid=document.getElementById('bingoGrid');
+    grid.innerHTML="";
+    bingoCells.forEach((c,i)=>{
+      const div=document.createElement('div');
+      div.className="bcell"+(c.done?" done":"");
+      div.textContent=c.t;
+      div.onclick=()=>{ c.done=!c.done; renderBingo(); };
+      grid.appendChild(div);
+    });
+    const done=bingoCells.filter(x=>x.done).length;
+    document.getElementById('bingoStatus').textContent="Cases cochées : "+done+(done>=3 ? " ✅ (victoire morale)" : "");
+  }
+  function bingoClear(){
+    bingoCells.forEach(c=>c.done=false);
+    renderBingo();
+  }
+  bingoGenerate();
+
+  /* Quiz */
+  const quizBank=[
+    {q:"Quel est l’objectif d’un résumé ?", a:["Raconter sa vie","Dire l’essentiel","Écrire plus long"], ok:1},
+    {q:"Dans un calcul, la priorité passe d’abord par…", a:["Les parenthèses","Les additions","Le hasard"], ok:0},
+    {q:"Une source fiable, c’est plutôt…", a:["“Tkt j’ai vu sur TikTok”","Un manuel / site officiel","Le cousin du voisin"], ok:1},
+    {q:"Quand tu comprends pas, la meilleure option c’est…", a:["Demander une explication","Souffrir en silence","Fuir en Mongolie"], ok:0},
+    {q:"Un bon titre de fiche doit être…", a:["Clair et court","Long comme un roman","Écrit en hiéroglyphes"], ok:0},
+    {q:"Pour mémoriser, c’est utile de…", a:["Relire passivement","Se tester (questions)","Attendre un miracle"], ok:1},
+  ];
+  let quiz=[];
+  let qi=0;
+  let qscore=0;
+
+  function quizStart(){
+    quiz=[...quizBank].sort(()=>Math.random()-0.5).slice(0,5);
+    qi=0; qscore=0;
+    showQ();
+  }
+  function showQ(){
+    const out=document.getElementById('quizOut');
+    const choices=document.getElementById('quizChoices');
+    const cur=quiz[qi];
+    out.innerHTML = `<b>Q${qi+1}/5</b> — ${cur.q}<br><span class="small">Choisis une réponse.</span>`;
+    choices.innerHTML="";
+    cur.a.forEach((txt,idx)=>{
+      const b=document.createElement('button');
+      b.className="action alt3";
+      b.textContent=txt;
+      b.onclick=()=>answer(idx);
+      choices.appendChild(b);
+    });
+  }
+  function answer(idx){
+    const cur=quiz[qi];
+    const out=document.getElementById('quizOut');
+    if(idx===cur.ok){ qscore++; out.innerHTML = `✅ Bien joué. Score : ${qscore}/${qi+1}`; }
+    else{ out.innerHTML = `❌ Nope. Score : ${qscore}/${qi+1}`; }
+    qi++;
+    document.getElementById('quizChoices').innerHTML="";
+    if(qi>=5){
+      setTimeout(()=>{
+        const verdict = (qscore>=4) ? "🐐 Machine de guerre." :
+                        (qscore>=2) ? "😎 Correct, tu survis." :
+                        "💀 T’es en mode écran noir, faut un café (ou un canard).";
+        out.innerHTML = `<b>Terminé</b> — Score : ${qscore}/5<br>${verdict}`;
+      }, 600);
+    }else{
+      setTimeout(showQ, 650);
+    }
+  }
+
+  /* Breath */
+  function breath(){
+    const el=document.getElementById('breathOut');
+    let t=10;
+    el.textContent="Inspire… 4s";
+    setTimeout(()=>el.textContent="Expire… 6s", 420);
+    const timer=setInterval(()=>{
+      t--;
+      if(t<=0){
+        clearInterval(timer);
+        el.textContent="✅ Voilà. Ton cerveau a reboot (un peu).";
+      }
+    }, 1000);
+  }
+</script>
+</body>
+</html>
